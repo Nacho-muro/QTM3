@@ -2,35 +2,42 @@ import streamlit as st
 import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
+import requests
 from qiskit import QuantumCircuit, transpile
 from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
 from qiskit.quantum_info import SparsePauliOp
 
+# Configura tu clave de API de Alpha Vantage aquí
+ALPHA_VANTAGE_API_KEY = "TU_CLAVE_DE_API"  # ¡Cámbialo por tu clave real!
+
 EXPLICACIONES = {
-    "Quantum Monte Carlo":
-        "Este algoritmo permite simular escenarios de mercado y estimar el valor futuro de la empresa bajo diferentes condiciones económicas.",
-    "QAOA":
-        "QAOA optimiza la combinación de empresas en una cartera para maximizar el rendimiento y minimizar el riesgo.",
-    "Grover's Algorithm":
-        "Grover puede buscar, entre miles de empresas, aquellas con mejor potencial de crecimiento según ciertos criterios.",
-    "HHL Algorithm":
-        "HHL resuelve sistemas complejos de ecuaciones para predecir el comportamiento financiero de la empresa."
+    "Quantum Monte Carlo": "Este algoritmo permite simular escenarios de mercado y estimar el valor futuro de la empresa bajo diferentes condiciones económicas.",
+    "QAOA": "QAOA optimiza la combinación de empresas en una cartera para maximizar el rendimiento y minimizar el riesgo.",
+    "Grover's Algorithm": "Grover puede buscar, entre miles de empresas, aquellas con mejor potencial de crecimiento según ciertos criterios.",
+    "HHL Algorithm": "HHL resuelve sistemas complejos de ecuaciones para predecir el comportamiento financiero de la empresa."
 }
+
+def obtener_empresas_mismo_sector(sector):
+    """Busca empresas del mismo sector usando Alpha Vantage (ejemplo, puede variar según la API)"""
+    # NOTA: Alpha Vantage no tiene un endpoint directo para buscar por sector.
+    # Este es un ejemplo ilustrativo. Puedes adaptarlo a otra API o usar una lista predefinida.
+    # En la práctica, muchas APIs financieras no permiten buscar por sector de forma directa.
+    # Como alternativa, puedes usar una base de datos local o una lista predefinida.
+    # Aquí simulamos la búsqueda para el ejemplo.
+    empresas = []
+    if sector == "Technology":
+        empresas = ["AAPL", "MSFT", "GOOGL", "AMZN", "META"]
+    elif sector == "Consumer Cyclical":
+        empresas = ["TSLA", "NFLX", "SBUX"]
+    elif sector == "Healthcare":
+        empresas = ["AMGN", "GILD", "BIIB"]
+    # Añade más sectores si lo deseas
+    return empresas
 
 st.title("Valoración Cuántica de Empresas con IBM Quantum")
 
-ticker = st.text_input(
-    "Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)"
-)
-algoritmo = st.selectbox(
-    "Selecciona el algoritmo cuántico",
-    [
-        "Quantum Monte Carlo",
-        "QAOA",
-        "Grover's Algorithm",
-        "HHL Algorithm"
-    ]
-)
+ticker = st.text_input("Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)")
+algoritmo = st.selectbox("Selecciona el algoritmo cuántico", list(EXPLICACIONES.keys()))
 calcular = st.button("Optimizar con IBM Quantum")
 
 st.caption("Esta demo obtiene datos reales y ejecuta un análisis cuántico usando IBM Quantum.")
@@ -45,8 +52,9 @@ if calcular and ticker.strip():
         eps = info.get("trailingEps", None)
         precio = info.get("currentPrice", None)
         moneda = info.get("currency", "USD")
+        sector = info.get("sector", "Desconocido")
 
-        st.subheader(f"{nombre} ({ticker})")
+        st.subheader(f"{nombre} ({ticker}) - Sector: {sector}")
         st.write(f"**Precio actual:** {precio} {moneda}" if precio else "Precio actual: No disponible")
         st.write(f"**PER:** {per if per else 'No disponible'}")
         st.write(f"**EPS:** {eps if eps else 'No disponible'}")
@@ -114,7 +122,6 @@ if calcular and ticker.strip():
 
                 job = estimator.run([(qc, observable, [])])
                 result = job.result()
-                # Verifica que el resultado tenga la estructura esperada
                 if hasattr(result, 'data') and hasattr(result.data, 'evs') and len(result.data.evs) > 0:
                     valor_cuantico = result.data.evs[0]
                     st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
@@ -137,12 +144,26 @@ if calcular and ticker.strip():
             else:
                 st.warning("No hay datos históricos disponibles.")
 
-            # Comparativa con el sector (ejemplo manual)
-            st.subheader("Comparativa con el sector (ejemplo)")
-            st.write("AAPL: PER=30, EPS=6.5 (valores de ejemplo)")
-            st.write("MSFT: PER=35, EPS=9.2 (valores de ejemplo)")
-            st.write("GOOGL: PER=28, EPS=5.8 (valores de ejemplo)")
-            st.write("Estos valores son solo ilustrativos. Puedes automatizar la comparativa con una API o base de datos.")
+            # Comparativa con el sector usando API externa (simulada)
+            st.subheader("Comparativa con el sector (usando API externa)")
+            tickers_comparar = obtener_empresas_mismo_sector(sector)
+            datos_comparativa = []
+            for ticker_c in tickers_comparar:
+                if ticker_c == ticker:
+                    continue  # No comparar consigo misma
+                empresa_c = yf.Ticker(ticker_c)
+                info_c = empresa_c.info
+                nombre_c = info_c.get("shortName", ticker_c)
+                per_c = info_c.get("trailingPE", None)
+                eps_c = info_c.get("trailingEps", None)
+                if per_c is not None and eps_c is not None:
+                    datos_comparativa.append((nombre_c, ticker_c, per_c, eps_c))
+            if datos_comparativa:
+                st.write(f"Empresas del sector {sector}:")
+                for nombre_c, ticker_c, per_c, eps_c in datos_comparativa:
+                    st.write(f"{nombre_c} ({ticker_c}): PER={per_c:.1f}, EPS={eps_c:.1f}")
+            else:
+                st.warning(f"No se encontraron empresas del mismo sector ({sector}) para comparar.")
 
             # Simulación de escenarios
             st.subheader("Simulación de escenarios")
