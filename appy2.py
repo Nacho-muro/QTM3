@@ -34,7 +34,7 @@ st.title("Valoración Cuántica de Empresas (Simulación)")
 
 ticker = st.text_input("Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)")
 algoritmo = st.selectbox("Selecciona el algoritmo cuántico", list(EXPLICACIONES.keys()))
-calcular = st.button("Optimizar con simulación cuántica")
+calcular = st.button("Simular valoración cuántica")
 
 st.caption("Esta demo obtiene datos reales y simula el análisis cuántico localmente, incluyendo factores externos. Preparada para un futuro salto a hardware cuántico real.")
 
@@ -56,7 +56,7 @@ if calcular and ticker.strip():
         st.write(f"**EPS:** {eps if eps else 'No disponible'}")
 
         if per is None or eps is None:
-            st.warning("No hay suficientes datos financieros para optimizar cuánticamente esta empresa.")
+            st.warning("No hay suficientes datos financieros para simular cuánticamente esta empresa.")
         else:
             try:
                 per = float(per)
@@ -73,7 +73,7 @@ if calcular and ticker.strip():
 
             # Simulación del valor esperado cuántico con factores externos
             valor_cuantico = valor_esperado_cuantico(per, eps, inflacion, tasa_interes, sentimiento)
-            st.success(f"Resultado cuántico (simulado con factores externos): {valor_cuantico:.3f}")
+            st.success(f"Resultado cuántico (simulado): {valor_cuantico:.3f}")
             if valor_cuantico > 0:
                 st.write("**Interpretación:** El análisis cuántico sugiere una perspectiva positiva para la empresa.")
             else:
