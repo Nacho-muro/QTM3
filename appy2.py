@@ -3,10 +3,9 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 
-# Simulación de factores externos (valores fijos o aleatorios)
+# --- Factores externos (simulados automáticamente) ---
 def obtener_factores_externos():
-    # Estos valores podrían obtenerse de una API o simularse aleatoriamente
-    # Ejemplo: inflación, tasa de interés, sentimiento tecnológico, estabilidad política
+    # Ejemplo: valores fijos o simulados para inflación, tasa de interés, sentimiento tecnológico y estabilidad política
     return {
         "inflacion": 2.5,  # %
         "tasa_interes": 2.0,  # %
@@ -14,17 +13,17 @@ def obtener_factores_externos():
         "estabilidad_politica": 0.8  # 0 a 1
     }
 
-# Simulación de PER, EPS y precio futuro según factores externos
-def simular_valores(per, eps, precio, años_futuros, factores):
-    # Ajuste por factores externos (ejemplo simplificado)
-    # El ajuste combina los factores externos en un único multiplicador
+# --- Simulación de PER, EPS y precio futuro según factores externos ---
+def simular_valores_futuros(per, eps, precio, años_futuros, factores):
+    # Calculamos el ajuste global por factores externos
+    # (ejemplo simplificado, puedes ajustar la fórmula según tus necesidades)
     ajuste = 1 + (factores["inflacion"] - 2) / 100 \
              + (factores["tasa_interes"] - 2) / 100 \
              + factores["sentimiento_tecnologico"] / 20 \
              + (factores["estabilidad_politica"] - 0.5) / 10
-    # El ajuste no puede ser negativo ni cero
-    ajuste = max(ajuste, 0.8)
-    # Simulación para cada año futuro
+    ajuste = max(ajuste, 0.8)  # Evitamos valores negativos o demasiado bajos
+
+    # Simulamos los valores para cada año futuro
     datos = []
     for año in años_futuros:
         per_simulado = per * (ajuste ** (año - 2025))
@@ -38,7 +37,7 @@ def simular_valores(per, eps, precio, años_futuros, factores):
         })
     return pd.DataFrame(datos)
 
-# Interfaz de usuario
+# --- Interfaz de usuario ---
 st.title("Simulación de valoración futura con factores externos")
 
 ticker = st.text_input("Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)")
@@ -66,12 +65,21 @@ if ticker.strip():
             eps = float(eps)
             factores = obtener_factores_externos()
 
+            # --- Explicación de los factores externos ---
             st.subheader("Factores externos aplicados")
-            st.write(f"**Inflación:** {factores['inflacion']}%")
-            st.write(f"**Tasa de interés:** {factores['tasa_interes']}%")
-            st.write(f"**Sentimiento tecnológico:** {factores['sentimiento_tecnologico']:.2f} (de -1 a 1)")
-            st.write(f"**Estabilidad política:** {factores['estabilidad_politica']:.2f} (de 0 a 1)")
+            st.write("Los factores externos se aplican automáticamente para ajustar el valor futuro de la empresa. Estos factores incluyen:")
+            st.write("- **Inflación:** Mide el aumento general de los precios en la economía. Una inflación alta puede reducir el poder adquisitivo y afectar los costos de la empresa.")
+            st.write("- **Tasa de interés:** Impacta en el coste del endeudamiento y en las decisiones de inversión. Una tasa alta puede frenar el crecimiento económico.")
+            st.write("- **Sentimiento tecnológico:** Refleja la confianza y el optimismo en el sector tecnológico. Un valor positivo indica un entorno favorable para la innovación.")
+            st.write("- **Estabilidad política:** Mide el grado de estabilidad y previsibilidad del entorno político. Una alta estabilidad favorece la inversión y el crecimiento.")
+            st.write("")
+            st.write("**Valores aplicados en esta simulación:**")
+            st.write(f"- **Inflación:** {factores['inflacion']}%")
+            st.write(f"- **Tasa de interés:** {factores['tasa_interes']}%")
+            st.write(f"- **Sentimiento tecnológico:** {factores['sentimiento_tecnologico']:.2f} (de -1 a 1)")
+            st.write(f"- **Estabilidad política:** {factores['estabilidad_politica']:.2f} (de 0 a 1)")
 
+            # --- Selección de años futuros ---
             st.subheader("Selecciona los años futuros a simular")
             años_futuros = st.multiselect(
                 "Años futuros",
@@ -79,7 +87,7 @@ if ticker.strip():
                 default=[2026, 2027, 2028]
             )
             if años_futuros:
-                df = simular_valores(per, eps, precio, años_futuros, factores)
+                df = simular_valores_futuros(per, eps, precio, años_futuros, factores)
                 st.subheader("Valores simulados para los años seleccionados")
                 st.dataframe(df.style.format({
                     "PER simulado": "{:.2f}",
