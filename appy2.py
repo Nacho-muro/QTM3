@@ -114,13 +114,16 @@ if calcular and ticker.strip():
 
                 job = estimator.run([(qc, observable, [])])
                 result = job.result()
-                valor_cuantico = result[0].data.evs[0]
-
-            st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
-            if valor_cuantico > 0:
-                st.write("**Interpretación:** El análisis cuántico sugiere una perspectiva positiva para la empresa.")
-            else:
-                st.write("**Interpretación:** El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
+                # Verifica que el resultado tenga la estructura esperada
+                if hasattr(result, 'data') and hasattr(result.data, 'evs') and len(result.data.evs) > 0:
+                    valor_cuantico = result.data.evs[0]
+                    st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
+                    if valor_cuantico > 0:
+                        st.write("**Interpretación:** El análisis cuántico sugiere una perspectiva positiva para la empresa.")
+                    else:
+                        st.write("**Interpretación:** El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
+                else:
+                    st.error("No se pudo obtener el resultado cuántico esperado. Verifica la ejecución del circuito.")
 
             # Gráfico de precio histórico
             st.subheader("Precio histórico")
