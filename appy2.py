@@ -45,36 +45,56 @@ if ticker.strip():
             per = float(per)
             eps = float(eps)
 
-            # Explicación de los escenarios
+            # --- Explicación de los factores externos ---
+            st.subheader("Factores externos aplicados")
+            st.write("Los factores externos se aplican automáticamente para ajustar el valor futuro de la empresa. Estos factores incluyen:")
+            st.write("- **Inflación:** Mide el aumento general de los precios en la economía. Una inflación alta puede reducir el poder adquisitivo y afectar los costos de la empresa.")
+            st.write("- **Tasa de interés:** Impacta en el coste del endeudamiento y en las decisiones de inversión. Una tasa alta puede frenar el crecimiento económico.")
+            st.write("- **Sentimiento tecnológico:** Refleja la confianza y el optimismo en el sector tecnológico. Un valor positivo indica un entorno favorable para la innovación.")
+            st.write("- **Estabilidad política:** Mide el grado de estabilidad y previsibilidad del entorno político. Una alta estabilidad favorece la inversión y el crecimiento.")
+            st.write("")
+            st.write("En el futuro, estos factores podrían ser filtrados y ponderados por una IA para enviar los datos más relevantes a IBM Quantum y obtener proyecciones más precisas.")
+            st.write("")
+
             st.subheader("Escenarios de simulación")
             st.write("Se muestran tres líneas de valoración para los próximos 20 años (2026-2045):")
             st.write("- **Optimista:** Factores externos muy favorables (crecimiento alto).")
             st.write("- **Base:** Factores externos normales (crecimiento moderado).")
             st.write("- **Conservadora:** Factores externos adversos (crecimiento bajo o negativo).")
             st.write("")
-            st.write("En el futuro, estas proyecciones podrían ser generadas por IBM Quantum según los datos filtrados por una IA.")
 
-            # Ajustes para cada escenario
-            ajuste_optimista = 1.05  # Crecimiento alto
-            ajuste_base = 1.02       # Crecimiento moderado (equivalente a los factores externos de ejemplo)
-            ajuste_conservador = 0.99 # Crecimiento bajo o negativo
-
-            # Simulación para cada escenario
+            # --- Barra para seleccionar años (afecta solo a la tabla) ---
+            st.subheader("Selecciona los años para la tabla")
             año_inicio = 2026
             año_fin = 2045
+            años_seleccionados = st.slider(
+                "Elige el rango de años para la tabla",
+                min_value=año_inicio,
+                max_value=año_fin,
+                value=(año_inicio, año_fin)
+            )
+            años_tabla = list(range(años_seleccionados[0], años_seleccionados[1] + 1))
+
+            # --- Ajustes para cada escenario ---
+            ajuste_optimista = 1.05
+            ajuste_base = 1.02
+            ajuste_conservador = 0.99
+
+            # --- Simulación para cada escenario ---
             df_optimista = simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste_optimista)
             df_base = simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste_base)
             df_conservador = simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste_conservador)
 
-            # Tabla con los valores base (o puedes mostrar las tres tablas si prefieres)
-            st.subheader("Valores simulados para el periodo 2026-2045 (escenario base)")
-            st.dataframe(df_base.style.format({
+            # --- Tabla con los valores base para los años seleccionados ---
+            df_tabla = df_base[df_base["Año"].isin(años_tabla)]
+            st.subheader(f"Valores simulados para los años {años_seleccionados[0]}-{años_seleccionados[1]} (escenario base)")
+            st.dataframe(df_tabla.style.format({
                 "PER simulado": "{:.2f}",
                 "EPS simulado": "{:.2f}",
                 "Precio futuro simulado": "{:.2f}"
             }))
 
-            # Gráfica con las tres líneas de valoración
+            # --- Gráfica con las tres líneas de valoración (siempre 20 años) ---
             st.subheader("Evolución de los valores simulados (2026-2045)")
             fig, ax = plt.subplots(figsize=(10, 6))
             if precio:
