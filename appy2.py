@@ -2,10 +2,9 @@ import streamlit as st
 import yfinance as yf
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
-# --- Factores externos (simulados automáticamente) ---
 def obtener_factores_externos():
-    # Ejemplo: valores fijos o simulados para inflación, tasa de interés, sentimiento tecnológico y estabilidad política
     return {
         "inflacion": 2.5,  # %
         "tasa_interes": 2.0,  # %
@@ -13,17 +12,12 @@ def obtener_factores_externos():
         "estabilidad_politica": 0.8  # 0 a 1
     }
 
-# --- Simulación de PER, EPS y precio futuro según factores externos ---
 def simular_valores_futuros(per, eps, precio, años_futuros, factores):
-    # Calculamos el ajuste global por factores externos
-    # (ejemplo simplificado, puedes ajustar la fórmula según tus necesidades)
     ajuste = 1 + (factores["inflacion"] - 2) / 100 \
              + (factores["tasa_interes"] - 2) / 100 \
              + factores["sentimiento_tecnologico"] / 20 \
              + (factores["estabilidad_politica"] - 0.5) / 10
-    ajuste = max(ajuste, 0.8)  # Evitamos valores negativos o demasiado bajos
-
-    # Simulamos los valores para cada año futuro
+    ajuste = max(ajuste, 0.8)
     datos = []
     for año in años_futuros:
         per_simulado = per * (ajuste ** (año - 2025))
@@ -37,7 +31,6 @@ def simular_valores_futuros(per, eps, precio, años_futuros, factores):
         })
     return pd.DataFrame(datos)
 
-# --- Interfaz de usuario ---
 st.title("Simulación de valoración futura con factores externos")
 
 ticker = st.text_input("Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)")
@@ -65,7 +58,6 @@ if ticker.strip():
             eps = float(eps)
             factores = obtener_factores_externos()
 
-            # --- Explicación de los factores externos ---
             st.subheader("Factores externos aplicados")
             st.write("Los factores externos se aplican automáticamente para ajustar el valor futuro de la empresa. Estos factores incluyen:")
             st.write("- **Inflación:** Mide el aumento general de los precios en la economía. Una inflación alta puede reducir el poder adquisitivo y afectar los costos de la empresa.")
@@ -79,12 +71,12 @@ if ticker.strip():
             st.write(f"- **Sentimiento tecnológico:** {factores['sentimiento_tecnologico']:.2f} (de -1 a 1)")
             st.write(f"- **Estabilidad política:** {factores['estabilidad_politica']:.2f} (de 0 a 1)")
 
-            # --- Selección de años futuros ---
             st.subheader("Selecciona los años futuros a simular")
+            # Ampliamos el rango a 20 años (2026-2045)
             años_futuros = st.multiselect(
                 "Años futuros",
-                options=[2026, 2027, 2028, 2029, 2030],
-                default=[2026, 2027, 2028]
+                options=list(range(2026, 2046)),
+                default=[2026, 2030, 2035, 2040, 2045]
             )
             if años_futuros:
                 df = simular_valores_futuros(per, eps, precio, años_futuros, factores)
@@ -94,5 +86,19 @@ if ticker.strip():
                     "EPS simulado": "{:.2f}",
                     "Precio futuro simulado": "{:.2f}"
                 }))
+
+                # Gráfica de evolución de los valores simulados
+                st.subheader("Evolución de los valores simulados")
+                fig, ax = plt.subplots(figsize=(10, 6))
+                if precio:
+                    ax.plot(df["Año"], df["Precio futuro simulado"], 'r-', label="Precio futuro simulado")
+                ax.plot(df["Año"], df["PER simulado"], 'b-', label="PER simulado")
+                ax.plot(df["Año"], df["EPS simulado"], 'g-', label="EPS simulado")
+                ax.set_xlabel("Año")
+                ax.set_ylabel("Valor")
+                ax.set_title(f"Evolución de los valores simulados para {nombre} ({ticker})")
+                ax.legend()
+                ax.grid(True)
+                st.pyplot(fig)
     except Exception as e:
         st.error(f"No se pudo obtener información o ejecutar la simulación: {e}")
