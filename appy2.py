@@ -4,22 +4,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def obtener_factores_externos():
-    return {
-        "inflacion": 2.5,  # %
-        "tasa_interes": 2.0,  # %
-        "sentimiento_tecnologico": 0.7,  # -1 a 1
-        "estabilidad_politica": 0.8  # 0 a 1
-    }
-
-def simular_valores_futuros(per, eps, precio, años_futuros, factores):
-    ajuste = 1 + (factores["inflacion"] - 2) / 100 \
-             + (factores["tasa_interes"] - 2) / 100 \
-             + factores["sentimiento_tecnologico"] / 20 \
-             + (factores["estabilidad_politica"] - 0.5) / 10
-    ajuste = max(ajuste, 0.8)
+def simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste):
+    años = range(año_inicio, año_fin + 1)
     datos = []
-    for año in años_futuros:
+    for año in años:
         per_simulado = per * (ajuste ** (año - 2025))
         eps_simulado = eps * (ajuste ** (año - 2025))
         precio_simulado = precio * (ajuste ** (año - 2025)) if precio else np.nan
@@ -31,7 +19,7 @@ def simular_valores_futuros(per, eps, precio, años_futuros, factores):
         })
     return pd.DataFrame(datos)
 
-st.title("Simulación de valoración futura con factores externos")
+st.title("Simulación de valoración futura con diferentes escenarios")
 
 ticker = st.text_input("Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)")
 if ticker.strip():
@@ -56,49 +44,54 @@ if ticker.strip():
         else:
             per = float(per)
             eps = float(eps)
-            factores = obtener_factores_externos()
 
-            st.subheader("Factores externos aplicados")
-            st.write("Los factores externos se aplican automáticamente para ajustar el valor futuro de la empresa. Estos factores incluyen:")
-            st.write("- **Inflación:** Mide el aumento general de los precios en la economía. Una inflación alta puede reducir el poder adquisitivo y afectar los costos de la empresa.")
-            st.write("- **Tasa de interés:** Impacta en el coste del endeudamiento y en las decisiones de inversión. Una tasa alta puede frenar el crecimiento económico.")
-            st.write("- **Sentimiento tecnológico:** Refleja la confianza y el optimismo en el sector tecnológico. Un valor positivo indica un entorno favorable para la innovación.")
-            st.write("- **Estabilidad política:** Mide el grado de estabilidad y previsibilidad del entorno político. Una alta estabilidad favorece la inversión y el crecimiento.")
+            # Explicación de los escenarios
+            st.subheader("Escenarios de simulación")
+            st.write("Se muestran tres líneas de valoración para los próximos 20 años (2026-2045):")
+            st.write("- **Optimista:** Factores externos muy favorables (crecimiento alto).")
+            st.write("- **Base:** Factores externos normales (crecimiento moderado).")
+            st.write("- **Conservadora:** Factores externos adversos (crecimiento bajo o negativo).")
             st.write("")
-            st.write("**Valores aplicados en esta simulación:**")
-            st.write(f"- **Inflación:** {factores['inflacion']}%")
-            st.write(f"- **Tasa de interés:** {factores['tasa_interes']}%")
-            st.write(f"- **Sentimiento tecnológico:** {factores['sentimiento_tecnologico']:.2f} (de -1 a 1)")
-            st.write(f"- **Estabilidad política:** {factores['estabilidad_politica']:.2f} (de 0 a 1)")
+            st.write("En el futuro, estas proyecciones podrían ser generadas por IBM Quantum según los datos filtrados por una IA.")
 
-            st.subheader("Selecciona los años futuros a simular")
-            # Ampliamos el rango a 20 años (2026-2045)
-            años_futuros = st.multiselect(
-                "Años futuros",
-                options=list(range(2026, 2046)),
-                default=[2026, 2030, 2035, 2040, 2045]
-            )
-            if años_futuros:
-                df = simular_valores_futuros(per, eps, precio, años_futuros, factores)
-                st.subheader("Valores simulados para los años seleccionados")
-                st.dataframe(df.style.format({
-                    "PER simulado": "{:.2f}",
-                    "EPS simulado": "{:.2f}",
-                    "Precio futuro simulado": "{:.2f}"
-                }))
+            # Ajustes para cada escenario
+            ajuste_optimista = 1.05  # Crecimiento alto
+            ajuste_base = 1.02       # Crecimiento moderado (equivalente a los factores externos de ejemplo)
+            ajuste_conservador = 0.99 # Crecimiento bajo o negativo
 
-                # Gráfica de evolución de los valores simulados
-                st.subheader("Evolución de los valores simulados")
-                fig, ax = plt.subplots(figsize=(10, 6))
-                if precio:
-                    ax.plot(df["Año"], df["Precio futuro simulado"], 'r-', label="Precio futuro simulado")
-                ax.plot(df["Año"], df["PER simulado"], 'b-', label="PER simulado")
-                ax.plot(df["Año"], df["EPS simulado"], 'g-', label="EPS simulado")
-                ax.set_xlabel("Año")
-                ax.set_ylabel("Valor")
-                ax.set_title(f"Evolución de los valores simulados para {nombre} ({ticker})")
-                ax.legend()
-                ax.grid(True)
-                st.pyplot(fig)
+            # Simulación para cada escenario
+            año_inicio = 2026
+            año_fin = 2045
+            df_optimista = simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste_optimista)
+            df_base = simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste_base)
+            df_conservador = simular_valores_futuros(per, eps, precio, año_inicio, año_fin, ajuste_conservador)
+
+            # Tabla con los valores base (o puedes mostrar las tres tablas si prefieres)
+            st.subheader("Valores simulados para el periodo 2026-2045 (escenario base)")
+            st.dataframe(df_base.style.format({
+                "PER simulado": "{:.2f}",
+                "EPS simulado": "{:.2f}",
+                "Precio futuro simulado": "{:.2f}"
+            }))
+
+            # Gráfica con las tres líneas de valoración
+            st.subheader("Evolución de los valores simulados (2026-2045)")
+            fig, ax = plt.subplots(figsize=(10, 6))
+            if precio:
+                ax.plot(df_optimista["Año"], df_optimista["Precio futuro simulado"], 'r-', label="Optimista (Precio)")
+                ax.plot(df_base["Año"], df_base["Precio futuro simulado"], 'b-', label="Base (Precio)")
+                ax.plot(df_conservador["Año"], df_conservador["Precio futuro simulado"], 'g-', label="Conservadora (Precio)")
+            ax.plot(df_optimista["Año"], df_optimista["PER simulado"], 'r--', label="Optimista (PER)")
+            ax.plot(df_base["Año"], df_base["PER simulado"], 'b--', label="Base (PER)")
+            ax.plot(df_conservador["Año"], df_conservador["PER simulado"], 'g--', label="Conservadora (PER)")
+            ax.plot(df_optimista["Año"], df_optimista["EPS simulado"], 'r:', label="Optimista (EPS)")
+            ax.plot(df_base["Año"], df_base["EPS simulado"], 'b:', label="Base (EPS)")
+            ax.plot(df_conservador["Año"], df_conservador["EPS simulado"], 'g:', label="Conservadora (EPS)")
+            ax.set_xlabel("Año")
+            ax.set_ylabel("Valor")
+            ax.set_title(f"Evolución de los valores simulados para {nombre} ({ticker})")
+            ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            ax.grid(True)
+            st.pyplot(fig)
     except Exception as e:
         st.error(f"No se pudo obtener información o ejecutar la simulación: {e}")
