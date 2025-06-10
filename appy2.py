@@ -2,13 +2,6 @@ import streamlit as st
 import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
-import requests
-from qiskit import QuantumCircuit, transpile
-from qiskit_ibm_runtime import QiskitRuntimeService, Estimator, Session
-from qiskit.quantum_info import SparsePauliOp
-
-# Configura tu clave de API de Alpha Vantage aquí
-ALPHA_VANTAGE_API_KEY = "TU_CLAVE_DE_API"  # ¡Cámbialo por tu clave real!
 
 EXPLICACIONES = {
     "Quantum Monte Carlo": "Este algoritmo permite simular escenarios de mercado y estimar el valor futuro de la empresa bajo diferentes condiciones económicas.",
@@ -17,30 +10,33 @@ EXPLICACIONES = {
     "HHL Algorithm": "HHL resuelve sistemas complejos de ecuaciones para predecir el comportamiento financiero de la empresa."
 }
 
-def obtener_empresas_mismo_sector(sector):
-    """Busca empresas del mismo sector usando Alpha Vantage (ejemplo, puede variar según la API)"""
-    # NOTA: Alpha Vantage no tiene un endpoint directo para buscar por sector.
-    # Este es un ejemplo ilustrativo. Puedes adaptarlo a otra API o usar una lista predefinida.
-    # En la práctica, muchas APIs financieras no permiten buscar por sector de forma directa.
-    # Como alternativa, puedes usar una base de datos local o una lista predefinida.
-    # Aquí simulamos la búsqueda para el ejemplo.
-    empresas = []
-    if sector == "Technology":
-        empresas = ["AAPL", "MSFT", "GOOGL", "AMZN", "META"]
-    elif sector == "Consumer Cyclical":
-        empresas = ["TSLA", "NFLX", "SBUX"]
-    elif sector == "Healthcare":
-        empresas = ["AMGN", "GILD", "BIIB"]
-    # Añade más sectores si lo deseas
-    return empresas
+# Diccionario de empresas de referencia por sector
+REFERENCIAS_SECTOR = {
+    "Technology": ["AAPL", "MSFT", "GOOGL", "AMZN", "META"],
+    "Consumer Cyclical": ["TSLA", "NFLX", "SBUX"],
+    "Healthcare": ["AMGN", "GILD", "BIIB"],
+}
 
-st.title("Valoración Cuántica de Empresas con IBM Quantum")
+def valor_esperado_cuantico(per, eps, inflacion=0, tasa_interes=0, sentimiento=0):
+    # Normalizar factores externos
+    inflacion_norm = min(max(inflacion, -10), 10) / 10
+    tasa_norm = min(max(tasa_interes, 0), 10) / 10
+    sentimiento_norm = min(max(sentimiento, -1), 1)
+    # Ponderar el impacto de los factores externos
+    impacto_externo = 0.2 * inflacion_norm + 0.3 * tasa_norm + 0.5 * sentimiento_norm
+    # Simulación del valor esperado cuántico
+    per_norm = min(max(per, 0), 100) / 100 * np.pi
+    eps_norm = min(max(eps, 0), 10) / 10 * np.pi
+    theta = per_norm + eps_norm + impacto_externo * np.pi
+    return np.sin(theta)
+
+st.title("Valoración Cuántica de Empresas (Simulación)")
 
 ticker = st.text_input("Introduce el ticker de la empresa (ej: AMZN, AAPL, GOOGL, TSLA)")
 algoritmo = st.selectbox("Selecciona el algoritmo cuántico", list(EXPLICACIONES.keys()))
-calcular = st.button("Optimizar con IBM Quantum")
+calcular = st.button("Optimizar con simulación cuántica")
 
-st.caption("Esta demo obtiene datos reales y ejecuta un análisis cuántico usando IBM Quantum.")
+st.caption("Esta demo obtiene datos reales y simula el análisis cuántico localmente, incluyendo factores externos. Preparada para un futuro salto a hardware cuántico real.")
 
 if calcular and ticker.strip():
     ticker = ticker.strip().upper()
@@ -69,68 +65,19 @@ if calcular and ticker.strip():
                 st.error("Error al convertir PER o EPS a número. Verifica los datos.")
                 st.stop()
 
-            per_norm = min(max(per, 0), 100) / 100 * np.pi
-            eps_norm = min(max(eps, 0), 10) / 10 * np.pi
-            theta = per_norm + eps_norm
+            # Factores externos simulados
+            st.subheader("Factores externos (simulados)")
+            inflacion = st.slider("Inflación (%)", -10.0, 10.0, 2.0)
+            tasa_interes = st.slider("Tasa de interés (%)", 0.0, 10.0, 2.0)
+            sentimiento = st.slider("Sentimiento de mercado (-1 a 1)", -1.0, 1.0, 0.0)
 
-            try:
-                service = QiskitRuntimeService(
-                    channel="ibm_quantum",
-                    token=st.secrets["IBM_QUANTUM_TOKEN"]
-                )
-            except Exception as e:
-                st.error(f"Error al inicializar el servicio IBM Quantum: {e}")
-                st.stop()
-
-            st.write("Backends físicos disponibles y su estado:")
-            backends_disponibles = []
-            for backend in service.backends(simulator=False):
-                status = backend.status()
-                st.write(f"{backend.name}: {'Disponible' if status.operational and status.status_msg == 'active' else status.status_msg}")
-                if status.operational and status.status_msg == 'active':
-                    backends_disponibles.append(backend)
-
-            if not backends_disponibles:
-                st.error("No hay backends físicos operativos en este momento. Intenta más tarde.")
-                st.stop()
-
-            backend = backends_disponibles[0]
-            num_qubits = backend.configuration().num_qubits
-            physical_qubit = num_qubits - 1
-
-            qc = QuantumCircuit(1)
-            qc.sx(0)
-            qc.rz(theta, 0)
-            qc.sx(0)
-
-            qc = transpile(
-                qc,
-                backend=backend,
-                initial_layout=[physical_qubit],
-                optimization_level=3
-            )
-
-            observable_str = "I" * physical_qubit + "Z" + "I" * (num_qubits - physical_qubit - 1)
-            observable = SparsePauliOp(observable_str)
-
-            st.info(f"Ejecutando en {backend.name} sobre el qubit físico {physical_qubit}...")
-
-            with Session(backend=backend) as session:
-                estimator = Estimator(mode=session)
-                estimator.options.resilience_level = 1
-                estimator.options.default_shots = 1024
-
-                job = estimator.run([(qc, observable, [])])
-                result = job.result()
-                if hasattr(result, 'data') and hasattr(result.data, 'evs') and len(result.data.evs) > 0:
-                    valor_cuantico = result.data.evs[0]
-                    st.success(f"Resultado cuántico (valor esperado): {valor_cuantico:.3f}")
-                    if valor_cuantico > 0:
-                        st.write("**Interpretación:** El análisis cuántico sugiere una perspectiva positiva para la empresa.")
-                    else:
-                        st.write("**Interpretación:** El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
-                else:
-                    st.error("No se pudo obtener el resultado cuántico esperado. Verifica la ejecución del circuito.")
+            # Simulación del valor esperado cuántico con factores externos
+            valor_cuantico = valor_esperado_cuantico(per, eps, inflacion, tasa_interes, sentimiento)
+            st.success(f"Resultado cuántico (simulado con factores externos): {valor_cuantico:.3f}")
+            if valor_cuantico > 0:
+                st.write("**Interpretación:** El análisis cuántico sugiere una perspectiva positiva para la empresa.")
+            else:
+                st.write("**Interpretación:** El análisis cuántico sugiere cautela o perspectiva negativa para la empresa.")
 
             # Gráfico de precio histórico
             st.subheader("Precio histórico")
@@ -144,43 +91,71 @@ if calcular and ticker.strip():
             else:
                 st.warning("No hay datos históricos disponibles.")
 
-            # Comparativa con el sector usando API externa (simulada)
-            st.subheader("Comparativa con el sector (usando API externa)")
-            tickers_comparar = obtener_empresas_mismo_sector(sector)
+            # Comparativa con el sector (valores reales)
+            st.subheader("Comparativa con el sector (valores reales)")
+            tickers_comparar = REFERENCIAS_SECTOR.get(sector, [])
             datos_comparativa = []
             for ticker_c in tickers_comparar:
                 if ticker_c == ticker:
-                    continue  # No comparar consigo misma
+                    continue
                 empresa_c = yf.Ticker(ticker_c)
                 info_c = empresa_c.info
                 nombre_c = info_c.get("shortName", ticker_c)
                 per_c = info_c.get("trailingPE", None)
                 eps_c = info_c.get("trailingEps", None)
                 if per_c is not None and eps_c is not None:
-                    datos_comparativa.append((nombre_c, ticker_c, per_c, eps_c))
+                    valor_cuantico_c = valor_esperado_cuantico(per_c, eps_c, inflacion, tasa_interes, sentimiento)
+                    datos_comparativa.append((nombre_c, ticker_c, per_c, eps_c, valor_cuantico_c))
             if datos_comparativa:
                 st.write(f"Empresas del sector {sector}:")
-                for nombre_c, ticker_c, per_c, eps_c in datos_comparativa:
-                    st.write(f"{nombre_c} ({ticker_c}): PER={per_c:.1f}, EPS={eps_c:.1f}")
+                for nombre_c, ticker_c, per_c, eps_c, valor_cuantico_c in datos_comparativa:
+                    st.write(f"{nombre_c} ({ticker_c}): PER={per_c:.1f}, EPS={eps_c:.1f}, Valor cuántico simulado={valor_cuantico_c:.3f}")
             else:
                 st.warning(f"No se encontraron empresas del mismo sector ({sector}) para comparar.")
 
-            # Simulación de escenarios
-            st.subheader("Simulación de escenarios")
-            with st.expander("Simula diferentes valores de PER y EPS"):
-                per_sim = st.slider("PER simulado", 0.0, 100.0, float(per))
-                eps_sim = st.slider("EPS simulado", 0.0, 20.0, float(eps))
-                per_norm_sim = min(max(per_sim, 0), 100) / 100 * np.pi
-                eps_norm_sim = min(max(eps_sim, 0), 20) / 20 * np.pi
-                theta_sim = per_norm_sim + eps_norm_sim
-                st.write(f"Valor cuántico simulado: {np.sin(theta_sim):.3f} (solo como ejemplo)")
+            # Evolución del valor esperado cuántico simulado según los años seleccionados
+            st.subheader("Evolución del valor esperado cuántico (simulado)")
+            hist = empresa.history(period="max")
+            if hist.empty:
+                st.warning("No hay datos históricos disponibles para simular.")
+            else:
+                años_disponibles = hist.index.year.unique()
+                año_min = int(min(años_disponibles))
+                año_max = int(max(años_disponibles))
+                año_inicio, año_fin = st.slider(
+                    "Selecciona el rango de años",
+                    min_value=año_min,
+                    max_value=año_max,
+                    value=(max(año_min, año_max - 5), año_max)
+                )
+                hist_filtrado = hist[(hist.index.year >= año_inicio) & (hist.index.year <= año_fin)]
+                if hist_filtrado.empty:
+                    st.warning("No hay datos históricos en el rango seleccionado.")
+                else:
+                    # Simular PER y EPS proporcionalmente al precio (aproximación)
+                    precio_actual = info.get("currentPrice", 1)
+                    per_actual = float(per) if per else 30.0
+                    eps_actual = float(eps) if eps else 6.0
+                    per_simulado = hist_filtrado["Close"] / (hist_filtrado["Close"].mean() / per_actual)
+                    eps_simulado = hist_filtrado["Close"] / (hist_filtrado["Close"].mean() / eps_actual)
+                    valores_esperados = []
+                    fechas = []
+                    for fecha, close, per_s, eps_s in zip(hist_filtrado.index, hist_filtrado["Close"], per_simulado, eps_simulado):
+                        valores_esperados.append(valor_esperado_cuantico(per_s, eps_s, inflacion, tasa_interes, sentimiento))
+                        fechas.append(fecha)
+                    fig, ax = plt.subplots()
+                    ax.plot(fechas, valores_esperados, marker='o')
+                    ax.set_title(f"Evolución del valor esperado cuántico simulado ({año_inicio}-{año_fin})")
+                    ax.set_ylabel("Valor esperado cuántico (simulado)")
+                    ax.set_xlabel("Fecha")
+                    st.pyplot(fig)
 
         st.markdown("---")
         st.write(EXPLICACIONES[algoritmo])
 
     except Exception as e:
-        st.error(f"No se pudo obtener información o ejecutar el análisis cuántico: {e}")
+        st.error(f"No se pudo obtener información o ejecutar la simulación cuántica: {e}")
 elif calcular:
     st.warning("Por favor, introduce el ticker de la empresa.")
 
-st.caption("Este análisis es experimental y educativo. Los resultados cuánticos dependen del modelo y los datos enviados.")
+st.caption("Este análisis es experimental y educativo. Los resultados cuánticos son simulados localmente, preparados para un futuro salto a hardware cuántico real.")
