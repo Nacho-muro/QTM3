@@ -75,7 +75,6 @@ if page == "Inicio":
             - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
             """)
             st.write("Estos factores se integran en los cálculos para ofrecer una valoración más precisa y adaptada al entorno real.")
-            st.write("[Ver explicación detallada de los conceptos](Conceptos clave)")
 
             st.subheader("Evolución de los valores simulados (2026-2045)")
             fig, ax = plt.subplots(figsize=(10, 6))
