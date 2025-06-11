@@ -75,9 +75,8 @@ if page == "Inicio":
             - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
             """)
             st.write("Estos factores se integran en los cálculos para ofrecer una valoración más precisa y adaptada al entorno real.")
-            st.write("[Ver explicación detallada de los conceptos](Conceptos clave)")
 
-            st.subheader("Evolución de los valores simulados (2026-2045)")
+            st.subheader("Rendimiento esperado")
             fig, ax = plt.subplots(figsize=(10, 6))
             if precio:
                 ax.plot(df_base["Año"], df_base["Precio futuro simulado"], 'b-', label="Precio futuro simulado")
@@ -86,7 +85,7 @@ if page == "Inicio":
                 ax.plot(df_base["Año"], df_base["EPS futuro simulado"], 'r:', label="EPS futuro simulado")
             ax.set_xlabel("Año")
             ax.set_ylabel("Valor")
-            ax.set_title(f"Evolución de los valores simulados para {nombre} ({ticker})")
+            ax.set_title(f"Rendimiento esperado para {nombre} ({ticker})")
             ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
             ax.grid(True)
             st.pyplot(fig)
@@ -119,7 +118,7 @@ elif page == "Conceptos clave":
     with st.expander("EPS (Beneficio por acción)"):
         st.markdown("""
         **¿Qué es?**  
-        El **EPS** (*Earnings Per Share*) mide la rentabilidad de una empresa por cada acción ordinaria en circulación.
+        El **EPS** (*Earnings Per Share*) mide la rentabilidad de a empresa por cada acción ordinaria en circulación.
 
         **Cálculo:**  
         $$
@@ -144,7 +143,7 @@ elif page == "Conceptos clave":
 
         **Interpretación:**  
         - **Un PER bajo puede indicar que la acción está infravalorada o que la empresa tiene problemas.**
-        - **Un PER alto sugiere que el mercado espera un crecimiento futuro o que la acción está sobrevalorada.**
+        - **Un PER alto sugiere que el mercado espera un crecimiento futuro o que la action está sobrevalorada.**
         - **Comparar el PER con el de otras empresas del sector ayuda a identificar oportunidades de inversión.**
         """)
 
@@ -167,7 +166,7 @@ elif page == "Conceptos clave":
     with st.expander("Valor intrínseco"):
         st.markdown("""
         **¿Qué es?**  
-        El **valor intrínseco** es una estimación del valor real o fundamental de una empresa or acción, basado en sus activos, pasivos, beneficios y perspectivas futuras, más allá de las fluctuaciones temporales del mercado.
+        El **valor intrínseco** es una estimación del valor real o fundamental de una empresa o acción, basado en sus activos, pasivos, beneficios y perspectivas futuras, más allá de las fluctuaciones temporales del mercado.
 
         **Cálculo (simplificado):**  
         $$
@@ -212,7 +211,7 @@ elif page == "Conceptos clave":
         $$
 
         **Interpretación:**  
-        - **Un ROE alto muestra que la empresa es eficiente al generar beneficios con el capital propio de los accionistas.**
+        - **Un ROE alto muestra que la empresa is eficiente al generar beneficios con el capital propio de los accionistas.**
         - **Un ROE bajo puede indicar baja rentabilidad o un uso ineficiente del capital.**
         - **Permite comparar la eficiencia de diferentes empresas en la generación de beneficios para sus accionistas.**
         """)
