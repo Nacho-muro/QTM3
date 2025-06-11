@@ -9,7 +9,7 @@ import io
 from pysentimiento import create_analyzer
 
 # Configura aquí tu clave de NewsAPI
-NEWSAPI_KEY = a9fe25c3e9364dd18f82349010fb28f7  # Reemplázalo por tu clave real
+NEWSAPI_KEY = "a9fe25c3e9364dd18f82349010fb28f7"  # Reemplázalo por tu clave real
 
 # Inicializa el analizador de sentimiento
 analyzer = create_analyzer(task="sentiment", lang="es")
