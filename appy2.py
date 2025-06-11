@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# --- Funciones de simulación (ejemplo simplificado) ---
 def simular_valores_futuros(precio, eps, año_inicio, año_fin, ajuste):
     años = range(año_inicio, año_fin + 1)
     datos = []
@@ -22,7 +21,6 @@ def simular_valores_futuros(precio, eps, año_inicio, año_fin, ajuste):
         })
     return pd.DataFrame(datos)
 
-# --- Navegación ---
 page = st.sidebar.radio("Navegar", ["Inicio", "Conceptos clave"])
 
 if page == "Inicio":
@@ -56,7 +54,6 @@ if page == "Inicio":
             )
             años_tabla = list(range(años_seleccionados[0], años_seleccionados[1] + 1))
 
-            # Ajustes para cada escenario (ejemplo simplificado)
             ajuste_base = 1.02
             df_base = simular_valores_futuros(precio, eps, año_inicio, año_fin, ajuste_base)
             df_tabla = df_base[df_base["Año"].isin(años_tabla)]
@@ -78,17 +75,8 @@ if page == "Inicio":
             - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
             """)
             st.write("Estos factores se integran en los cálculos para ofrecer una valoración más precisa y adaptada al entorno real.")
-
-            st.subheader("¿Qué significan estos indicadores?")
-            st.write("""
-            - **EPS (Beneficio por acción):** Mide la rentabilidad de la empresa por cada acción ordinaria.
-            - **PER (Ratio Precio/Beneficio):** Indica cuánto está dispuesto a pagar el mercado por cada unidad de beneficio.
-            - **P/A (Precio/Activos):** Compara el precio de la acción con el valor contable de los activos netos por acción.
-            - **Valor intrínseco:** Estimación del valor real o fundamental de la empresa, basado en activos, pasivos, beneficios y expectativas futuras.
-            """)
             st.write("[Ver explicación detallada de los conceptos](Conceptos clave)")
 
-            # --- Gráfica de evolución ---
             st.subheader("Evolución de los valores simulados (2026-2045)")
             fig, ax = plt.subplots(figsize=(10, 6))
             if precio:
