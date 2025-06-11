@@ -72,9 +72,10 @@ if page == "Inicio":
             - **Políticas y cuestiones legales:** Cambios regulatorios, estabilidad política.
             - **Tecnología:** Avances tecnológicos y su impacto en el sector.
             - **Aspectos sociales:** Cambios demográficos, tendencias de consumo.
-            - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
+            - **Competencia y mercado:** Dinámica competitive, cambios en la demanda.
             """)
             st.write("Estos factores se integran en los cálculos para ofrecer una valoración más precisa y adaptada al entorno real.")
+            st.write("[Ver explicación detallada de los conceptos](Conceptos clave)")
 
             st.subheader("Evolución de los valores simulados (2026-2045)")
             fig, ax = plt.subplots(figsize=(10, 6))
@@ -95,59 +96,115 @@ if page == "Inicio":
 
 elif page == "Conceptos clave":
     st.title("Conceptos clave del mercado de valores")
-    st.write("""
-    ## EPS (Beneficio por acción)
-    El **EPS** (Earnings Per Share) es una medida de la rentabilidad de una empresa, que indica cuánto beneficio neto corresponde a cada acción ordinaria en circulación.  
-    **Cálculo:**  
-    $$
-    \\text{EPS} = \\frac{\\text{Beneficio neto} - \\text{Dividendos preferentes}}{\\text{Número de acciones ordinarias en circulación}}
-    $$
-    **Importancia:**  
-    Un EPS alto indica que la empresa es más rentable por acción. Es fundamental para comparar empresas del mismo sector y evaluar su crecimiento a lo largo del tiempo.
+    
+    st.markdown("""
+    ## Introducción al mercado de valores
 
-    ## PER (Ratio Precio/Beneficio)
-    El **PER** (Price-to-Earnings Ratio) mide cuánto está dispuesto a pagar el mercado por cada unidad de beneficio de la empresa.  
-    **Cálculo:**  
-    $$
-    \\text{PER} = \\frac{\\text{Precio de la acción}}{\\text{EPS}}
-    $$
-    **Interpretación:**  
-    Un PER bajo puede indicar que la acción está infravalorada o que la empresa tiene problemas. Un PER alto sugiere que el mercado espera un crecimiento futuro o que la acción está sobrevalorada.
+    El **mercado de valores** es el lugar donde se compran y venden acciones, bonos y otros instrumentos financieros emitidos por empresas y gobiernos.  
+    Su función principal es facilitar la inversión y el financiamiento, permitiendo a las empresas obtener capital para crecer y a los inversores participar de los beneficios económicos de esas empresas.
 
-    ## P/A (Precio/Activos)
-    El ratio **P/A** compara el precio de la acción con el valor contable de los activos netos por acción.  
-    **Cálculo:**  
-    $$
-    \\text{P/A} = \\frac{\\text{Precio de la acción}}{\\text{Valor contable por acción}}
-    $$
-    **Importancia:**  
-    Es especialmente relevante para empresas con muchos activos tangibles (bancos, inmobiliarias, etc.).
-
-    ## Valor intrínseco
-    El **valor intrínseco** es una estimación del valor real o fundamental de una empresa o acción, basado en sus activos, pasivos, beneficios y perspectivas futuras, más allá de las fluctuaciones temporales del mercado.  
-    **Cálculo (simplificado):**  
-    $$
-    \\text{Valor Intrínseco} = \\text{Activos} - \\text{Pasivos}
-    $$
-    **Por acción:**  
-    $$
-    \\text{Valor Intrínseco por acción} = \\frac{\\text{Valor Intrínseco}}{\\text{Número de acciones en circulación}}
-    $$
-    **Métodos avanzados:**  
-    El método más usado es el **descuento de flujos de caja (DCF)**, que actualiza los flujos futuros de caja esperados al valor presente, teniendo en cuenta el riesgo y la tasa de descuento.
-    **Importancia:**  
-    Permite identificar si una acción está sobrevalorada o infravalorada comparando el valor intrínseco con el precio de mercado.
-
-    ## Factores externos
-    Son variables del entorno que afectan el valor de una empresa, pero que no dependen directamente de su gestión.  
-    **Ejemplos:**  
-    - **Situación económica:** Inflación, tasas de interés, crecimiento del PIB.
-    - **Políticas y cuestiones legales:** Cambios regulatorios, estabilidad política.
-    - **Tecnología:** Avances tecnológicos y su impacto en el sector.
-    - **Aspectos sociales:** Cambios demográficos, tendencias de consumo.
-    - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
-    **Importancia:**  
-    Estos factores se integran en los cálculos para ofrecer una valoración más realista y adaptada al entorno actual.
+    El mercado de valores se divide en dos grandes segmentos:
+    - **Mercado primario:** donde las empresas emiten nuevos valores para obtener financiación.
+    - **Mercado secundario:** donde los inversores negocian valores ya emitidos entre sí, aportando liquidez y permitiendo la formación de precios según la oferta y la demanda.
     """)
-    st.write("")
+
+    st.markdown("---")
+
+    st.markdown("""
+    ## Indicadores financieros clave
+
+    **Estos indicadores te ayudarán a comprender mejor los resultados de las simulaciones y a tomar decisiones informadas.**
+    """)
+
+    with st.expander("EPS (Beneficio por acción)"):
+        st.markdown("""
+        **¿Qué es?**  
+        El **EPS** (*Earnings Per Share*) mide la rentabilidad de una empresa por cada acción ordinaria en circulación.
+
+        **Cálculo:**  
+        $$
+        \\text{EPS} = \\frac{\\text{Beneficio neto} - \\text{Dividendos preferentes}}{\\text{Número de acciones ordinarias en circulación}}
+        $$
+
+        **¿Por qué es importante?**  
+        Un EPS alto indica que la empresa es más rentable por acción.  
+        Es fundamental para comparar empresas del mismo sector y evaluar su crecimiento a lo largo del tiempo.
+        """)
+
+    with st.expander("PER (Ratio Precio/Beneficio)"):
+        st.markdown("""
+        **¿Qué es?**  
+        El **PER** (*Price-to-Earnings Ratio*) mide cuánto está dispuesto a pagar el mercado por cada unidad de beneficio de la empresa.
+
+        **Cálculo:**  
+        $$
+        \\text{PER} = \\frac{\\text{Precio de la acción}}{\\text{EPS}}
+        $$
+
+        **¿Por qué es importante?**  
+        Un PER bajo puede indicar que la acción está infravalorada o que la empresa tiene problemas.  
+        Un PER alto sugiere que el mercado espera un crecimiento futuro o que la acción está sobrevalorada.
+        """)
+
+    with st.expander("P/A (Precio/Activos)"):
+        st.markdown("""
+        **¿Qué es?**  
+        El ratio **P/A** (*Price-to-Assets*) compara el precio de la acción con el valor contable de los activos netos por acción.
+
+        **Cálculo:**  
+        $$
+        \\text{P/A} = \\frac{\\text{Precio de la acción}}{\\text{Valor contable por acción}}
+        $$
+
+        **¿Por qué es importante?**  
+        Es especialmente relevante para empresas con muchos activos tangibles (bancos, inmobiliarias, etc.).
+        """)
+
+    with st.expander("Valor intrínseco"):
+        st.markdown("""
+        **¿Qué es?**  
+        El **valor intrínseco** es una estimación del valor real o fundamental de una empresa o acción, basado en sus activos, pasivos, beneficios y perspectivas futuras, más allá de las fluctuaciones temporales del mercado.
+
+        **Cálculo (simplificado):**  
+        $$
+        \\text{Valor Intrínseco} = \\text{Activos} - \\text{Pasivos}
+        $$
+
+        **Por acción:**  
+        $$
+        \\text{Valor Intrínseco por acción} = \\frac{\\text{Valor Intrínseco}}{\\text{Número de acciones en circulación}}
+        $$
+
+        **Métodos avanzados:**  
+        El método más usado es el **descuento de flujos de caja (DCF)**, que actualiza los flujos futuros de caja esperados al valor presente, teniendo en cuenta el riesgo y la tasa de descuento.
+
+        **¿Por qué es importante?**  
+        Permite identificar si una acción está sobrevalorada o infravalorada comparando el valor intrínseco con el precio de mercado.
+        """)
+
+    st.markdown("---")
+
+    st.markdown("""
+    ## Factores externos que afectan a las empresas
+
+    **Estos factores no dependen directamente de la gestión de la empresa, pero pueden influir en su valoración y desempeño.**
+    """)
+
+    with st.expander("Factores externos"):
+        st.markdown("""
+        **¿Qué son?**  
+        Son variables del entorno que afectan el valor de una empresa, pero que no dependen directamente de su gestión.
+
+        **Ejemplos:**  
+        - **Situación económica:** Inflación, tasas de interés, crecimiento del PIB.
+        - **Políticas y cuestiones legales:** Cambios regulatorios, estabilidad política.
+        - **Tecnología:** Avances tecnológicos y su impacto en el sector.
+        - **Aspectos sociales:** Cambios demográficos, tendencias de consumo.
+        - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
+
+        **¿Por qué son importantes?**  
+        Estos factores se integran en los cálculos para ofrecer una valoración más realista y adaptada al entorno actual.
+        """)
+
+    st.markdown("---")
     st.write("[Volver a la simulación](Inicio)")
