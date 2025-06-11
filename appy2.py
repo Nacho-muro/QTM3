@@ -72,7 +72,7 @@ if page == "Inicio":
             - **Políticas y cuestiones legales:** Cambios regulatorios, estabilidad política.
             - **Tecnología:** Avances tecnológicos y su impacto en el sector.
             - **Aspectos sociales:** Cambios demográficos, tendencias de consumo.
-            - **Competencia y mercado:** Dinámica competitive, cambios en la demanda.
+            - **Competencia y mercado:** Dinámica competitiva, cambios en la demanda.
             """)
             st.write("Estos factores se integran en los cálculos para ofrecer una valoración más precisa y adaptada al entorno real.")
             st.write("[Ver explicación detallada de los conceptos](Conceptos clave)")
@@ -126,9 +126,10 @@ elif page == "Conceptos clave":
         \\text{EPS} = \\frac{\\text{Beneficio neto} - \\text{Dividendos preferentes}}{\\text{Número de acciones ordinarias en circulación}}
         $$
 
-        **¿Por qué es importante?**  
-        Un EPS alto indica que la empresa es más rentable por acción.  
-        Es fundamental para comparar empresas del mismo sector y evaluar su crecimiento a lo largo del tiempo.
+        **Interpretación:**  
+        - **Un EPS alto indica que la empresa es más rentable por acción.**
+        - **Un EPS bajo puede reflejar baja rentabilidad o problemas operativos.**
+        - **Es fundamental para comparar empresas del mismo sector y evaluar su crecimiento a lo largo del tiempo.**
         """)
 
     with st.expander("PER (Ratio Precio/Beneficio)"):
@@ -141,9 +142,10 @@ elif page == "Conceptos clave":
         \\text{PER} = \\frac{\\text{Precio de la acción}}{\\text{EPS}}
         $$
 
-        **¿Por qué es importante?**  
-        Un PER bajo puede indicar que la acción está infravalorada o que la empresa tiene problemas.  
-        Un PER alto sugiere que el mercado espera un crecimiento futuro o que la acción está sobrevalorada.
+        **Interpretación:**  
+        - **Un PER bajo puede indicar que la acción está infravalorada o que la empresa tiene problemas.**
+        - **Un PER alto sugiere que el mercado espera un crecimiento futuro o que la acción está sobrevalorada.**
+        - **Comparar el PER con el de otras empresas del sector ayuda a identificar oportunidades de inversión.**
         """)
 
     with st.expander("P/A (Precio/Activos)"):
@@ -156,14 +158,16 @@ elif page == "Conceptos clave":
         \\text{P/A} = \\frac{\\text{Precio de la acción}}{\\text{Valor contable por acción}}
         $$
 
-        **¿Por qué es importante?**  
-        Es especialmente relevante para empresas con muchos activos tangibles (bancos, inmobiliarias, etc.).
+        **Interpretación:**  
+        - **Un P/A bajo puede indicar que la empresa está infravalorada respecto a sus activos.**
+        - **Un P/A alto puede reflejar expectativas de crecimiento o activos intangibles no reflejados en el balance.**
+        - **Es especialmente relevante para empresas con muchos activos tangibles (bancos, inmobiliarias, etc.).**
         """)
 
     with st.expander("Valor intrínseco"):
         st.markdown("""
         **¿Qué es?**  
-        El **valor intrínseco** es una estimación del valor real o fundamental de una empresa o acción, basado en sus activos, pasivos, beneficios y perspectivas futuras, más allá de las fluctuaciones temporales del mercado.
+        El **valor intrínseco** es una estimación del valor real o fundamental de una empresa or acción, basado en sus activos, pasivos, beneficios y perspectivas futuras, más allá de las fluctuaciones temporales del mercado.
 
         **Cálculo (simplificado):**  
         $$
@@ -175,11 +179,58 @@ elif page == "Conceptos clave":
         \\text{Valor Intrínseco por acción} = \\frac{\\text{Valor Intrínseco}}{\\text{Número de acciones en circulación}}
         $$
 
-        **Métodos avanzados:**  
-        El método más usado es el **descuento de flujos de caja (DCF)**, que actualiza los flujos futuros de caja esperados al valor presente, teniendo en cuenta el riesgo y la tasa de descuento.
+        **Interpretación:**  
+        - **Si el valor intrínseco es mayor que el precio de mercado, la acción podría estar infravalorada.**
+        - **Si el valor intrínseco es menor que el precio de mercado, la acción podría estar sobrevalorada.**
+        - **Este indicador ayuda a identificar oportunidades de inversión fundamentadas en el análisis financiero profundo.**
+        """)
 
-        **¿Por qué es importante?**  
-        Permite identificar si una acción está sobrevalorada o infravalorada comparando el valor intrínseco con el precio de mercado.
+    with st.expander("EV/EBITDA (Enterprise Value to Earnings Before Interest, Taxes, Depreciation and Amortization)"):
+        st.markdown("""
+        **¿Qué es?**  
+        El **EV/EBITDA** es un ratio que mide el valor total de la empresa respecto a su capacidad de generar beneficios operativos, excluyendo el impacto de la estructura financiera, los impuestos y los gastos no monetarios (depreciación y amortización).
+
+        **Cálculo:**  
+        $$
+        \\text{EV/EBITDA} = \\frac{\\text{Enterprise Value (EV)}}{\\text{EBITDA}}
+        $$
+
+        **Interpretación:**  
+        - **Un EV/EBITDA bajo puede indicar que la empresa está infravalorada respecto a su capacidad de generar beneficios operativos.**
+        - **Un EV/EBITDA alto puede reflejar expectativas de crecimiento, activos intangibles o que la empresa está sobrevalorada.**
+        - **Es útil para comparar empresas con diferentes estructuras de capital (por ejemplo, empresas con mucho o poco deuda), ya que el ratio neutraliza el efecto de la financiación y los impuestos.**
+        """)
+
+    with st.expander("ROE (Return on Equity)"):
+        st.markdown("""
+        **¿Qué es?**  
+        El **ROE** (*Return on Equity*) indica la rentabilidad que genera la empresa con el capital invertido por los accionistas.
+
+        **Cálculo:**  
+        $$
+        \\text{ROE} = \\frac{\\text{Beneficio neto}}{\\text{Patrimonio neto}}
+        $$
+
+        **Interpretación:**  
+        - **Un ROE alto muestra que la empresa es eficiente al generar beneficios con el capital propio de los accionistas.**
+        - **Un ROE bajo puede indicar baja rentabilidad o un uso ineficiente del capital.**
+        - **Permite comparar la eficiencia de diferentes empresas en la generación de beneficios para sus accionistas.**
+        """)
+
+    with st.expander("Dividend Yield"):
+        st.markdown("""
+        **¿Qué es?**  
+        El **Dividend Yield** muestra el porcentaje de dividendo que reparte la empresa respecto al precio de la acción.
+
+        **Cálculo:**  
+        $$
+        \\text{Dividend Yield} = \\frac{\\text{Dividendos anuales por acción}}{\\text{Precio de la acción}} \\times 100
+        $$
+
+        **Interpretación:**  
+        - **Un Dividend Yield alto puede indicar una empresa madura que reparte buena parte de sus beneficios entre los accionistas.**
+        - **Un Dividend Yield bajo puede reflejar que la empresa prefiere reinvertir sus beneficios en el crecimiento o que su precio de mercado es alto respecto a los dividendos repartidos.**
+        - **Permite comparar el retorno por dividendo de diferentes acciones, siendo especialmente útil para inversores que buscan ingresos periódicos.**
         """)
 
     st.markdown("---")
